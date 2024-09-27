@@ -14,14 +14,6 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                // Build Docker image
-                script {
-                    dockerImage = docker.build("${IMAGE_NAME}:$BUILD_NUMBER")
-                }
-            }
-        }
 
         stage('Test') {
             steps {
@@ -31,6 +23,15 @@ pipeline {
             }
         }
 
+        stage('Build') {
+            steps {
+                // Build Docker image
+                script {
+                    dockerImage = docker.build("${IMAGE_NAME}:$BUILD_NUMBER")
+                }
+            }
+        }
+        
        /** stage('Clean up') {
             steps {
                 // Clean up workspace and remove unused Docker images
