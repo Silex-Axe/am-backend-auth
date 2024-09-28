@@ -1,6 +1,8 @@
 pipeline {
     agent any
 
+    tools {nodejs "nodejs"}
+
     environment {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         IMAGE_NAME = 'am-backend/auth-service'
