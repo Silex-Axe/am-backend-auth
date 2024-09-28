@@ -14,16 +14,20 @@ pipeline {
             }
         }
 
-
-        stage('Test') {
+stage('Install Dependencies') {
+            steps {
+                // Install dependencies before running tests
+                sh 'npm install'
+            }
+        }
+        stage('Run Unit Tests') {
             steps {
                 // Run tests (use npm for TypeScript projects)
-                sh 'npm install'
                 sh 'npm run test'
             }
         }
 
-        stage('Build') {
+        stage('Docker Image') {
             steps {
                 // Build Docker image
                 script {
@@ -32,7 +36,18 @@ pipeline {
             }
         }
         
-       /** stage('Clean up') {
+       /**
+       stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        dockerImage.push("${env.BUILD_NUMBER}")
+                        dockerImage.push("latest")
+                    }
+                }
+            }
+            
+        stage('Clean up') {
             steps {
                 // Clean up workspace and remove unused Docker images
                 sh 'docker system prune -f'
@@ -45,6 +60,11 @@ pipeline {
             // Archive test results and cleanup
             junit '**/test-reports/*.xml'
             cleanWs()
+        }
+
+        failure {
+            // Notify on failure (email, Slack, etc.)
+            echo "Pipeline failed"
         }
     }
 }
